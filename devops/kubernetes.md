@@ -45,7 +45,7 @@ Project URL: https://fluxcd.io/
 
 That means that when the source configuration is changed, Flux will update the cluster state to match it. In other words, Flux will watch for changes in the .yaml sources and apply them on the cluster.
 
-Example: the spec.replicas field is modified from 2 to 3 on the deployment.yaml file that describes a Deployment object. When the change is commited to the Git repository, Flux will identify the change and apply the intended increase of replicas on the cluster.
+Example: the spec.replicas field is modified from 2 to 3 on the deployment.yaml file that describes a Deployment object. When the change is pushed to the Git repository, Flux will identify the change and apply the intended increase of replicas on the cluster.
 
 ### Flux useful commands
 
