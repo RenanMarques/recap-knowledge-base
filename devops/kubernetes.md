@@ -24,7 +24,7 @@ Each cluster is assigned to a context. The context contains information necessar
 
 Display all contexts and indicates which one is active.
 ```sh
-kubectl config get-context
+kubectl config get-contexts
 ```
 
 Switch context:
