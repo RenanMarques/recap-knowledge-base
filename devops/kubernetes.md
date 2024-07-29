@@ -54,7 +54,7 @@ Bootstrap:
 flux bootstrap github --owner=RenanMarques --repository=my-repository --path=clusters/development
 ```
 This command will set up Flux in the repository.
-There are other venders like bitbucket, 
+There are other venders like bitbucket, gitlab, git, etc.
 
 Display flux logs:
 ```sh
