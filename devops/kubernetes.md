@@ -14,6 +14,22 @@ kind create cluster -n production
 
 Use `-n` flag to inform the name for the cluster.
 
+### Debug cluster creation
+
+When cluster creation fails, you can rerun the `kind create` command with the `--retain` in order to retain the cluster for debuging.
+
+`kind export logs` will export logs files to a temporary folder indicated on the output of the command.
+
+### Fix: too many files open
+
+I had some problems creating a third cluster on my machine with Kind. Found out that I had ran out of `inotify` resources.
+
+Found the error message `Failed to create control group inotify object: Too many open files` on the logs exported form kind in the `serial.log` file.
+
+Increasing the variables `fs.inotify.max_user_watches` and `fs.inotify.max_user_instances` did the trick for me. More on this on the link below.
+
+Source: https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files
+
 ## kubectl
 
 The `kubectl` command line tool is the main tool for interacting with the clusters.
