@@ -53,6 +53,90 @@ One can also use the `--context` flag to indicate the context of a operation (de
 kubectl get all --context kind-development
 ```
 
+## Kustomize
+
+Kustomize is a standalone tool that got integrated into `kubectl` command.
+
+Project URL: https://github.com/kubernetes-sigs/kustomize
+
+Docs on: https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/
+
+You can customize Kubernetes objects with Kustomize. You need to write a kustomization file (`kustomization.yaml`) that indicates the YAML resources (services, deployments, etc) and the customizations to be done to those resorces (e.g. add a common label). You will then generate resource configuration (YAML files) with the constumizations applied (original sources are kept untouched).
+
+Example: given a service.yaml and a deployment.yaml resource files, the following kustomization.yaml will add new resources with the `app: myapp` labels.
+
+```
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonLabels:
+  app: myapp
+resources:
+  - deployment.yaml
+  - service.yaml
+```
+
+Generate resource config with `kubectl kustomize .` on the folder containing those files. Or apply them directly with `kubectl apply -k .` on the same folder.
+
+
+### Overlays
+
+Overlays are useful to generate variants with a common base. Often used to generate per-environment config resources.
+
+Example: generate resource files for development and production environments with differente number of replicas.
+
+File structure:
+```
+~/my-app
+├── base
+|     ├── kustomization.yaml
+|     ├── service.yaml
+|     └── deployment.yaml
+├── development
+|     ├── kustomization.yaml
+|     ├── namespace.yaml
+|     └── deployment-patch.yaml
+└── production
+      ├── kustomization.yaml
+      ├── namespace.yaml
+      └── deployment-patch.yaml
+```
+
+All common configuration are defined in the base folder. Specifics are defined on kustomization files on folders for each environment.
+
+~/my-app/development/kustomization.yaml
+```
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../base
+- namespace.yaml
+
+namespace: development
+namePrefix: dev-
+
+patches:
+- path: deployment-patch.yaml
+```
+
+~/my-app/development/deployment-patch.yaml
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podinfo
+spec:
+  replicas: 2
+```
+
+The kustomization file must indicate on the `resources` field the folder with the base `kustomization.yaml` and other configuration resources with specifics (e.g. the namespace.yaml defining the environment specific namespace).
+
+There are various fields for customizing the resources, like the `namespace` for changing the namespace of the objects and `namePrefix` for prefixing the object names, shown on the example above. See more on https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#kustomize-feature-list.
+
+Patches indicated on the `patches` field are also applied, overwriting the fields values with those defined on the patches. Every file indicated as a patch must resolve to a Kubernetes object. In the above example the number of replicas of the Deployment object is set to 2 for the development environment.
+
+Running the Kustomize on the `development` folder will generate sources with the base configurations plus the configurations on this folder.
+
+
 ## Flux
 
 Flux is a tool for keeping clusters in synch with it's source configuration.
